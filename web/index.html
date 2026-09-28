@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SCM-CORE 受発注管理システム</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="app-header__brand">
+        <span class="app-header__logo">SCM-CORE</span>
+        <span class="app-header__subtitle">統合基幹業務システム / 受発注管理</span>
+      </div>
+      <div class="app-header__user">
+        <span>営業部 / 端末ID: T-0421</span>
+        <span id="today"></span>
+      </div>
+    </header>
+
+    <nav class="app-nav">
+      <ul>
+        <li class="is-active">受発注登録</li>
+        <li>在庫照会</li>
+        <li>請求管理</li>
+        <li>マスタ管理</li>
+      </ul>
+    </nav>
+
+    <main class="app-main">
+      <!-- ============ 入力画面 ============ -->
+      <section id="screen-input" class="screen">
+        <h1 class="screen__title">受発注データ登録 <span class="screen__code">[ORD-0100]</span></h1>
+        <p class="screen__note">
+          <span class="required-mark">*</span> は必須項目です。入力後、画面下部の「受発注データの登録」ボタンを押してください。
+        </p>
+
+        <form id="order-form" novalidate>
+          <fieldset class="panel">
+            <legend>基本情報</legend>
+            <div class="grid">
+              <div class="field">
+                <label for="orderNumber">注文番号 <span class="required-mark">*</span></label>
+                <input type="text" id="orderNumber" name="orderNumber" placeholder="例: PO-2026-0001" autocomplete="off" />
+                <p class="field__error" data-error-for="orderNumber"></p>
+              </div>
+
+              <div class="field">
+                <label for="orderDate">受注日 <span class="required-mark">*</span></label>
+                <input type="date" id="orderDate" name="orderDate" />
+                <p class="field__error" data-error-for="orderDate"></p>
+              </div>
+
+              <div class="field">
+                <label for="customerCode">取引先 <span class="required-mark">*</span></label>
+                <select id="customerCode" name="customerCode">
+                  <option value="">-- 選択してください --</option>
+                  <option value="C-1001">C-1001 : 山田製作所</option>
+                  <option value="C-1002">C-1002 : 東京電子工業</option>
+                  <option value="C-1003">C-1003 : 北斗マテリアル</option>
+                  <option value="C-1004">C-1004 : 関西精密機器</option>
+                  <option value="C-1005">C-1005 : 九州テクノサービス</option>
+                </select>
+                <p class="field__error" data-error-for="customerCode"></p>
+              </div>
+
+              <div class="field">
+                <label for="deliveryDate">納品希望日</label>
+                <input type="date" id="deliveryDate" name="deliveryDate" />
+                <p class="field__error" data-error-for="deliveryDate"></p>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="panel">
+            <legend>明細情報</legend>
+            <div class="grid">
+              <div class="field">
+                <label for="productCode">商品コード <span class="required-mark">*</span></label>
+                <select id="productCode" name="productCode">
+                  <option value="">-- 選択してください --</option>
+                  <option value="P-2001">P-2001 : 精密ボルト M6</option>
+                  <option value="P-2002">P-2002 : ステンレス板 SUS304</option>
+                  <option value="P-2003">P-2003 : 樹脂カバー TypeB</option>
+                  <option value="P-2004">P-2004 : ベアリングユニット</option>
+                  <option value="P-2005">P-2005 : 制御基板 Rev.2</option>
+                </select>
+                <p class="field__error" data-error-for="productCode"></p>
+              </div>
+
+              <div class="field">
+                <label for="quantity">数量 <span class="required-mark">*</span></label>
+                <input type="number" id="quantity" name="quantity" min="1" step="1" placeholder="例: 120" />
+                <p class="field__error" data-error-for="quantity"></p>
+              </div>
+
+              <div class="field">
+                <label for="unitPrice">単価 (円) <span class="required-mark">*</span></label>
+                <input type="number" id="unitPrice" name="unitPrice" min="0" step="1" placeholder="例: 1500" />
+                <p class="field__error" data-error-for="unitPrice"></p>
+              </div>
+
+              <div class="field">
+                <label for="currency">通貨</label>
+                <select id="currency" name="currency">
+                  <option value="JPY" selected>JPY : 日本円</option>
+                  <option value="USD">USD : 米ドル</option>
+                  <option value="EUR">EUR : ユーロ</option>
+                </select>
+                <p class="field__error" data-error-for="currency"></p>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="panel">
+            <legend>取引条件</legend>
+            <div class="grid">
+              <div class="field">
+                <label for="paymentTerms">支払条件 <span class="required-mark">*</span></label>
+                <select id="paymentTerms" name="paymentTerms">
+                  <option value="">-- 選択してください --</option>
+                  <option value="30日後支払">30日後支払</option>
+                  <option value="60日後支払">60日後支払</option>
+                  <option value="月末締め翌月末払い">月末締め翌月末払い</option>
+                  <option value="前払い">前払い</option>
+                </select>
+                <p class="field__error" data-error-for="paymentTerms"></p>
+              </div>
+
+              <div class="field">
+                <span class="field__label">出荷方法</span>
+                <div class="radio-group" role="radiogroup" aria-label="出荷方法">
+                  <label><input type="radio" name="shippingMethod" value="通常便" checked /> 通常便</label>
+                  <label><input type="radio" name="shippingMethod" value="急送便" /> 急送便</label>
+                  <label><input type="radio" name="shippingMethod" value="引取" /> 引取</label>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="picName">担当者名</label>
+                <input type="text" id="picName" name="picName" placeholder="例: 鈴木 一郎" autocomplete="off" />
+                <p class="field__error" data-error-for="picName"></p>
+              </div>
+
+              <div class="field">
+                <span class="field__label">検収要否</span>
+                <label class="checkbox"><input type="checkbox" id="inspectionRequired" name="inspectionRequired" /> 検収が必要</label>
+              </div>
+
+              <div class="field field--wide">
+                <label for="remarks">備考</label>
+                <textarea id="remarks" name="remarks" rows="3" placeholder="任意入力"></textarea>
+              </div>
+            </div>
+          </fieldset>
+
+          <p id="form-error" class="form-error" role="alert" hidden></p>
+
+          <div class="actions">
+            <button type="reset" class="button button--ghost" id="clear-button">クリア</button>
+            <button type="submit" class="button button--primary" id="register-button">受発注データの登録</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ============ 確認画面 ============ -->
+      <section id="screen-confirm" class="screen" hidden>
+        <h1 class="screen__title">受発注データ登録確認 <span class="screen__code">[ORD-0101]</span></h1>
+        <p class="screen__note">以下の内容で登録します。内容が正しいことを確認し、「登録を確定する」ボタンを押してください。</p>
+
+        <table class="confirm-table">
+          <tbody id="confirm-body"></tbody>
+        </table>
+
+        <div class="actions">
+          <button type="button" class="button button--ghost" id="back-button">入力画面に戻る</button>
+          <button type="button" class="button button--primary" id="commit-button">登録を確定する</button>
+        </div>
+      </section>
+
+      <!-- ============ 完了画面 ============ -->
+      <section id="screen-complete" class="screen" hidden>
+        <h1 class="screen__title">受発注データ登録完了 <span class="screen__code">[ORD-0102]</span></h1>
+        <p class="complete-message" id="complete-message" role="status"></p>
+        <div class="actions">
+          <button type="button" class="button button--primary" id="new-entry-button">続けて登録する</button>
+        </div>
+      </section>
+
+      <!-- ============ 登録済みデータ一覧 ============ -->
+      <section class="panel panel--list">
+        <div class="panel--list__header">
+          <h2>登録済み受発注データ (ブラウザ保存)</h2>
+          <button type="button" class="button button--ghost button--small" id="clear-storage-button">保存データを全削除</button>
+        </div>
+        <table class="list-table">
+          <thead>
+            <tr>
+              <th>登録日時</th>
+              <th>注文番号</th>
+              <th>取引先</th>
+              <th>商品コード</th>
+              <th>数量</th>
+              <th>単価</th>
+              <th>金額</th>
+            </tr>
+          </thead>
+          <tbody id="stored-orders"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer class="app-footer">SCM-CORE v3.2.1 / ハンズオン用モックアプリケーション (データはブラウザの localStorage に保存されます)</footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
